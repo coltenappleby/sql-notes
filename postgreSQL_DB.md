@@ -19,3 +19,17 @@ DROP DATABASE IF EXISTS "nameofdb";
 ```sh
 psql -p 5432 -d "nameofDB"
 ```
+
+### Navigating Postgres.app
+
+Open App and double click on a Database. This will open a postgres terminal window. Here you can use postgres commands such as \l to list all databases.
+
+
+### =# vs -#
+
+You must end all lines with a semicolon. -# means that the system is waiting for more input.
+
+
+## postgres shell commands
+\l --- lists all databases
+\q --- quits current database
