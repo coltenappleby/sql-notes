@@ -131,7 +131,7 @@ FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-people" people
 	FETCH FIRST 1 ROW ONLY) phone_numbers
 	ON true;
 
--------- CURRENT
+-------------------------- CURRENT --------------------------
 
 -- REAL QUERY
 SELECT people.*,
@@ -147,7 +147,7 @@ SELECT people.*,
 			ELSE NULL
 	END as phone_number_type
 --	stages.name as stage_name, stages.position as stage_num, jobs.position_title, entries.created_at as pipeline_entry_created_at, jobs.id as job_id
-	
+	tags.name as tags_name
 FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-people" people
 -- Certifications
 	LEFT JOIN LATERAL (SELECT certifications.*	-- Takes the longest title certification. Removes the rest
@@ -177,6 +177,14 @@ FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-people" people
 		ORDER BY phone_numbers.created_at DESC
 		FETCH FIRST 1 ROW ONLY) phone_numbers
 		ON true
+    -- Tags
+    LEFT JOIN LATERAL (SELECT taggings.*	-- Takes the most recent pipeline entry (by created_at). Removes the rest
+        FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-taggings" taggings 
+        WHERE people.id = taggings.record_id
+        ORDER BY taggings.id DESC
+        FETCH FIRST 1 ROW ONLY) taggings
+        ON true
+    LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-tags" tags on taggings.tag_id = tags.id;
 -- JOB + STAGE
 --	LEFT OUTER JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-pipeline_entries" entries on people.id = entries.person_id
 --	LEFT JOIN LATERAL (SELECT entry_stages.*	-- Takes the most recent pipeline entry (by created_at). Removes the rest
