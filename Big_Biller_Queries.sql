@@ -192,3 +192,18 @@ ORDER BY people.id
 
 
 ;
+
+
+-- JOBS
+
+SELECT jobs.*, tags.name as tag_name, hiring_manager.first_name as hiring_manager
+FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-jobs" jobs
+LEFT JOIN LATERAL (SELECT taggings.*	-- Takes the most recent pipeline entry (by taggings). Removes the rest
+	FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-taggings" taggings 
+	WHERE jobs.id = taggings.record_id
+	ORDER BY taggings.id DESC
+	FETCH FIRST 1 ROW ONLY) taggings
+	ON true
+LEFT  JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-tags" tags on taggings.tag_id = tags.id
+LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-users" hiring_manager on jobs.owner_id = hiring_manager.id;
+
