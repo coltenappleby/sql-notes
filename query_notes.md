@@ -1,10 +1,10 @@
-### SQL Notes
+# SQL Notes
 
 
 
 ## Joins
 
-# LEFT JOIN
+### LEFT JOIN
 Will grab everthing from the first table and only the information that is available for those lines on the second table
 
 Schema
@@ -42,7 +42,7 @@ Outputs to
 | Sailor Saturn  | Hotaru Tomoe  |         | Infinity Academy                    |
 | Sailor Pluto   | Setsuna Meiou |         |                                     |
 
-## INNER JOIN
+### INNER JOIN
 Will return only the lines that have information from both tables 
 ```SQL
 SELECT senshi_name as sailor_senshi, real_name_jpn as real_name, cats.name as cat, schools.school
@@ -55,7 +55,7 @@ sailor_senshi	real_name		cat		school
 Sailor Moon		Usagi Tsukino	Luna	Juuban Municipal Junior High School
 Sailor Mercury	Ami Mizuno		Artemis	TA Academy for Girls
 
-# Limiting a JOIN to one row for each left join table row
+### Limiting a JOIN to one row for each left join table row
 ```SQL 
 -- Trying to select one row for each left table instance
     SELECT people.id, people.first_name, people.last_name, certifications.*
@@ -77,12 +77,12 @@ Sailor Mercury	Ami Mizuno		Artemis	TA Academy for Girls
 
 ## Other Functions
 
-# Concating two columns together into one
+### Concating two columns together into one
 ```SQL
 	CONCAT (db.first_name, ' ', db.last_name) as full_name
 ```
 
-# Count Function
+### Count Function
 ```SQL
     --  Count of a records for each user - record_id is the user_id
     SELECT addresses.record_id, count(addresses.record_id) as count
@@ -92,7 +92,7 @@ Sailor Mercury	Ami Mizuno		Artemis	TA Academy for Girls
 ```
 ## Other SQL Query Notes 
 
-# Trying to remove columns that are only NULL
+### Trying to remove columns that are only NULL
 ```SQL
     SELECT *
     FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-certifications"
