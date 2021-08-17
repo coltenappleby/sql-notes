@@ -77,7 +77,54 @@ ORDER BY people.id;
 
 ---- JOBS ----
 
-SELECT jobs.*, tags.name as tag_name, hiring_manager.first_name as hiring_manager
+SELECT jobs.*, tags.name as tag, 
+	CASE jobs.job_type
+		WHEN 0 THEN 'direct_hire'
+		WHEN 1 THEN 'contract'
+		WHEN 2 THEN 'temp_to_hire'
+		ELSE NULL
+	END as job_type,
+	CASE jobs.status
+		WHEN 0 THEN 'open'
+		WHEN 1 THEN 'active_contract'
+		WHEN 2 THEN 'closed'
+		WHEN 3 THEN 'filled'
+		WHEN 4 THEN 'cancelled'
+		WHEN 5 THEN 'on_hold'
+		ELSE NULL
+	END as job_status,
+	CASE jobs.job_type
+		WHEN 0 THEN 'direct_hire'
+		WHEN 1 THEN 'contract'
+		WHEN 2 THEN 'temp_to_hire'
+		ELSE NULL
+	END as job_type,
+	CASE jobs.compensation_type
+		WHEN 0 THEN 'per_hour'
+		WHEN 1 THEN 'per year'
+		ELSE NULL
+	END as compensation_type,
+	CASE jobs.priority
+		WHEN 0 THEN 'not_specified'
+		WHEN 1 THEN 'C'
+		WHEN 2 THEN 'B'
+		WHEN 3 THEN 'A'
+		ELSE NULL
+	END as job_priority,
+	CASE jobs.remote_option
+		WHEN 0 THEN 'full'
+		WHEN 1 THEN 'no'
+		WHEN 2 THEN 'available'
+		WHEN 3 THEN 'not_specified'
+		ELSE NULL
+	END as remote_option,
+	CASE jobs.fee_type
+		WHEN 0 THEN 'percentage'
+		WHEN 1 THEN 'amount'
+		ELSE NULL
+	END as fee_type,
+	CONCAT (hiring_manager.first_name, ' ', hiring_manager.last_name) as hiring_manager,
+	companies.name as company_name
 FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-jobs" jobs
 LEFT JOIN LATERAL (SELECT taggings.*	-- Takes the most recent pipeline entry (by taggings). Removes the rest
 	FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-taggings" taggings 
@@ -86,4 +133,5 @@ LEFT JOIN LATERAL (SELECT taggings.*	-- Takes the most recent pipeline entry (by
 	FETCH FIRST 1 ROW ONLY) taggings
 	ON true
 LEFT  JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-tags" tags on taggings.tag_id = tags.id
-LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-users" hiring_manager on jobs.owner_id = hiring_manager.id;
+LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-users" hiring_manager on jobs.owner_id = hiring_manager.id
+LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-companies" companies on jobs.company_id = companies.id;
