@@ -98,3 +98,17 @@ Sailor Mercury	Ami Mizuno		Artemis	TA Academy for Girls
     FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-certifications"
     WHERE "57b91e17-da0f-4c2d-beb4-39d6eb216746-certifications".expiration IS NOT NULL;
 ```
+
+### Cases
+```SQL
+	CASE dbt.column_name
+		WHEN 0 THEN 'open'
+		WHEN 1 THEN 'active_contract'
+		WHEN 2 THEN 'closed'
+		WHEN 3 THEN 'filled'
+		WHEN 4 THEN 'cancelled'
+		WHEN 5 THEN 'on_hold'
+		ELSE NULL
+	END as named_query
+```
+Create these in Excel using concat()
