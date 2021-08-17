@@ -33,3 +33,18 @@ You must end all lines with a semicolon. -# means that the system is waiting for
 ## postgres shell commands
 \l --- lists all databases
 \q --- quits current database
+
+## Limiting One
+```SQL 
+	LEFT JOIN LATERAL (SELECT educations.*	-- Takes the highest education level from degree. Removes the rest
+		FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-educations" educations 
+		WHERE people.id = educations.person_id
+		ORDER BY educations.degree DESC
+		FETCH FIRST 1 ROW ONLY) educations
+		ON true
+``` 
+
+## Concating two columns together into one
+```SQL
+	CONCAT (db.first_name, ' ', db.last_name) as full_name
+```
