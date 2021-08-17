@@ -132,8 +132,6 @@ FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-people" people
 	ON true;
 
 -------------------------- CURRENT --------------------------
-
--- REAL QUERY
 SELECT people.*,
 --	people.id, people.first_name, people.last_name, 
 	certifications.title as certification_title, certifications.received as certification_received, certifications.expiration as certification_expiration, -- expiration is probably uncessary
@@ -145,10 +143,16 @@ SELECT people.*,
 			WHEN 2 THEN 'work'
 			WHEN 3 THEN 'mobile'
 			ELSE NULL
-	END as phone_number_type
---	stages.name as stage_name, stages.position as stage_num, jobs.position_title, entries.created_at as pipeline_entry_created_at, jobs.id as job_id
-	tags.name as tags_name
+	END as phone_number_type,
+	tags.name as tags_name,
+	entries.id as pipeline_entry_id,
+	stages.name as stage_name, stages.position as stage_num,
+	jobs.position_title as job_title, jobs.id as job_id, companies.name,
+	CONCAT (hiring_managers.first_name, ' ', hiring_managers.last_name) as hiring_manager
+	
+	
 FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-people" people
+
 -- Certifications
 	LEFT JOIN LATERAL (SELECT certifications.*	-- Takes the longest title certification. Removes the rest
 		FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-certifications" certifications 
@@ -177,29 +181,28 @@ FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-people" people
 		ORDER BY phone_numbers.created_at DESC
 		FETCH FIRST 1 ROW ONLY) phone_numbers
 		ON true
-    -- Tags
-    LEFT JOIN LATERAL (SELECT taggings.*	-- Takes the most recent pipeline entry (by created_at). Removes the rest
-        FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-taggings" taggings 
-        WHERE people.id = taggings.record_id
-        ORDER BY taggings.id DESC
-        FETCH FIRST 1 ROW ONLY) taggings
-        ON true
-    LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-tags" tags on taggings.tag_id = tags.id;
--- JOB + STAGE
---	LEFT OUTER JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-pipeline_entries" entries on people.id = entries.person_id
---	LEFT JOIN LATERAL (SELECT entry_stages.*	-- Takes the most recent pipeline entry (by created_at). Removes the rest
---		FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-pipeline_entry_stages" entry_stages 
---		WHERE entries.id = entry_stages.entry_id
---		ORDER BY entry_stages.entry_time DESC
---		FETCH FIRST 1 ROW ONLY) entry_stages
---		ON true
---	JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-pipeline_stages" stages on entry_stages.stage_id = stages.id
---	JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-pipelines" pipelines on entries.pipeline_id = pipelines.id
---	JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-jobs" jobs on pipelines.job_id = jobs.id
-ORDER BY people.id
+-- Tags
+	LEFT JOIN LATERAL (SELECT taggings.*	-- Takes the most recent pipeline entry (by created_at). Removes the rest
+		FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-taggings" taggings 
+		WHERE people.id = taggings.record_id
+		ORDER BY taggings.id DESC
+		FETCH FIRST 1 ROW ONLY) taggings
+		ON true
+	LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-tags" tags on taggings.tag_id = tags.id
 
-
-;
+-- JOB + STAGE + Hiring Manager
+	LEFT JOIN LATERAL (SELECT entries.*	-- Takes the most recent pipeline entry (by created_at). Removes the rest
+		FROM "57b91e17-da0f-4c2d-beb4-39d6eb216746-pipeline_entries" entries 
+		WHERE people.id = entries.person_id
+		ORDER BY entries.updated_at DESC
+		FETCH FIRST 1 ROW ONLY) entries
+		ON true
+	LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-pipeline_stages" stages on entries.stage_id = stages.id
+	LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-pipelines" pipelines on entries.pipeline_id = pipelines.id
+	LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-jobs" jobs on pipelines.job_id = jobs.id
+	LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-companies" companies on jobs.company_id = companies.id
+	LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-users" hiring_managers on jobs.owner_id = hiring_managers.id
+ORDER BY people.id;
 
 
 -- JOBS
@@ -214,4 +217,5 @@ LEFT JOIN LATERAL (SELECT taggings.*	-- Takes the most recent pipeline entry (by
 	ON true
 LEFT  JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-tags" tags on taggings.tag_id = tags.id
 LEFT JOIN "57b91e17-da0f-4c2d-beb4-39d6eb216746-users" hiring_manager on jobs.owner_id = hiring_manager.id;
+
 
