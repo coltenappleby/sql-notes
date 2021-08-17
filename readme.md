@@ -6,7 +6,7 @@ Creating tables use this link
 https://www.tablesgenerator.com/markdown_tables
 
 
-Its **BEATUTIFUL**!!
+Its **BEAUTIFUL**!!
 
 | sailor_senshi  | real_name     | cat     | school                              |
 |----------------|---------------|---------|-------------------------------------|
